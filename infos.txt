@@ -3,6 +3,13 @@
   Prof: Jorge Sant Ana
 
 -------------------------------------------------------------------------
+# COMANDOS
+-------------------------------------------------------------------------
+npm install express -save --------------| "-save" vai trazer os arquivos para dentro do nosso projeto (cria o dir node_modules)
+npm install -g nodemon -----------------| recurso do ambiente de dev, restarta o server sempre quando há nova alteração
+	nodemon app ------------------------| rodar o server
+
+-------------------------------------------------------------------------
 # 9 Arquivos até a aula 9 :: criação de servidor simples
 -------------------------------------------------------------------------
 
@@ -52,8 +59,13 @@ Implementa API e métodos p manip de forma mais fácil finções do Node para_
 - controle de rota-
 - meddlewares (controle dos módulos uqe estão entre a requisição e o response)
 
-=> EJS :: Uma linguagem de modelagem para criação de páginas HTML utilizando JavaScript
+=> EJS :: É um engine de view. Uma linguagem de modelagem para criação de páginas HTML utilizando JavaScript
 
 => Nodemon :: Um utilitário que reinicia automaticamente o server NodeJS quando houver qualquer alteração em nossos scripts
 
 => npm ::Um gerenciador de pacores JavaScript
+
+-------------------------------------------------------------------------
+# 18 CommonJS (Módulos)
+-------------------------------------------------------------------------
+CommonJS é um formato de escrita que define a construção dos módulos.
