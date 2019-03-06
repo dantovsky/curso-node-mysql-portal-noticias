@@ -7,10 +7,17 @@
 -------------------------------------------------------------------------
 npm install express -save --------------| "-save" vai trazer os arquivos para dentro do nosso projeto (cria o dir node_modules)
 npm install -g nodemon -----------------| recurso do ambiente de dev, restarta o server sempre quando há nova alteração
-	nodemon app ------------------------| rodar o server
+nodemon app ----------------------------| rodar o server
+
+Módulo MySQL
+npm install mysql --save (--save para disponibilizar este módulo junto com o projeto)
+npm install consign --save (faz o autoload das rotas e outros arquivos)
+npm install body-parser --save (permite transformar os dados para o formato JSON no body das requisições)
+npm install express-validator --save (validações de campos dos forms)
 
 -------------------------------------------------------------------------
 # 9 Arquivos até a aula 9 :: criação de servidor simples
+
 -------------------------------------------------------------------------
 
 // console.log('Criando um site de notícias com NodeJS');
@@ -69,3 +76,232 @@ Implementa API e métodos p manip de forma mais fácil finções do Node para_
 # 18 CommonJS (Módulos)
 -------------------------------------------------------------------------
 CommonJS é um formato de escrita que define a construção dos módulos.
+
+-------------------------------------------------------------------------
+# 21 NPM - Instalando o modulo de conexão do MySQL
+-------------------------------------------------------------------------
+Instalar o módulo de MySQL
+npm install mysql --save (--save porque queremos disponibilizar este módulo junto com o projeto)
+
+-------------------------------------------------------------------------
+# 23 Criando e populando o banco de dados do projeto prático portal de notícias (MySQL)
+-------------------------------------------------------------------------
+
+Passos:
+- ativar o MySQL no XAMPP
+- ir à pasta "C:\xampp\mysql\bin"
+- abrir CMD nesta pasta e rodar o comando "./mysql -u root -p" e inserir o password do user root
+
+# Comandos MySQL
+- show databases;
+- create database portal_noticias;
+- show tables;
+
+create table noticias(
+	id_noticia int not null primary key auto_increment,
+	titulo varchar(100),
+	noticia text,
+	data_criacao timestamp default current_timestamp
+);
+
+INSERT INTO noticias(titulo, noticia) VALUES ('Outra noticia', 'Conteúdo da outra notícia.');
+
+select * from noticias;
+
+Adicionar uma nova coluna na tabela:
+alter table noticias add column resumo varchar(100);
+MariaDB [portal_noticias]> alter table noticias add column data_noticia date;
+
+-------------------------------------------------------------------------
+# 25 EJS - Criando views dinâmicas com JavaScript
+-------------------------------------------------------------------------
+
+Código dinâmico com JavaScript: <% processamento %> ou <%= processamento %>
+
+Exemplo ::
+
+<% for(var i=0; i < noticias.length; i++) { %>
+	<tr>
+		<td><%= noticias[i].id_noticia  %></td>
+		<td><%= noticias[i].titulo %></td>
+		<td><%= noticias[i].noticia  %></td>
+	</tr>
+<% } %>
+
+-------------------------------------------------------------------------
+# 29 Utilizando o Consign
+-------------------------------------------------------------------------
+npm install consign --save
+
+Este módulo faz o autoload das rotas e outros arquivos, não sendo mais necessário fazer o require dos arquivos de rotas no app.js.
+
+Usaremos o consign também para incluir automaticamente as conexões com o BD.
+
+# No arquivo app.js, retirou-se então:
+// var de rotas retiradas :: por causa da instalação do consign, que gerencia isso automaticamente
+// pegando todas as rotas  e atribuindo para o app, sem a necessidade de o fazer explicitamente
+var rotaNoticias = require('./app/routes/noticias');
+rotaNoticias(app);
+var rotaHome = require('./app/routes/home')(app); // outra forma de fazer o require e executar a funcao
+var rotaFormInclusaoNoticia = require('./app/routes/formulario_inclusao_noticia')(app);
+
+
+-------------------------------------------------------------------------
+# 38 Body Parser
+-------------------------------------------------------------------------
+npm install body-parser --save (permite transformar os dados para o formato JSON no body das requisições)
+
+O body parser funciona como um meedleware, ou seja, vai atuar nos obj de requisição e resposta.
+Após instalar no projeto, ele precisa ser parametrizado na app.
+
+-------------------------------------------------------------------------
+# 39 Inserindo Registo noBD MySQL
+-------------------------------------------------------------------------
+Uma maneira interessante que o MySQL tem é aceitar um JSON como parametro. Ou seja, em vez de fazer:
+INSERT INTO noticias (titulo, conteudo) VALUES ('Titulo da Noticia', 'Conteudo da noticia.');
+
+Fazemos apenas:
+insert into noticias set ?
+
+...e passamos um parametro com o JSON. Neste caso os nomos dos rótulos das key no JSON precisam ser os mesmo das colunas no MySQL. Exemplo completo:
+this.salvarNoticia = function(noticia, connection, callback){
+	connection.query('insert into noticias set ? ', noticia, callback);
+}
+
+# Exemplo de todo o processo para salvar um registo ::
+
+- - - na view do formulário, temos:
+
+<form action="/noticias/salvar" method="post">
+	<label>Título</label>
+	<input type="text" id="titulo" name="titulo" placeholder="Título da notícia">
+	<br>
+	<label>Notícia</label>
+	<textarea id="noticia" name="noticia" rows="5" cols="30"></textarea>
+	<br>
+	<input class="btn" type="submit" value="Enviar">
+</form>
+
+- - - em routes/admin:
+	application.post('/noticias/salvar', function(req, res) {
+        var noticia = req.body;
+
+        // ------------------------------------------------------
+        // Salvar Registo na BD
+        // ------------------------------------------------------
+
+        // Passos ::
+        // - recuperar a conexao
+        // - recuperar o model
+        // - enviar para uma funcao de salvar
+        // - implementar uma funcao de callback para retornar para a tela que lista as notícias
+
+        var connection = application.config.dbConnection(); //dbConnection();
+        var noticiasModel = application.app.models.noticiasModel;
+        noticiasModel.salvarNoticia(noticia, connection, function(error, result) {
+            res.redirect("/noticias");
+            // res.render("noticias/noticias", {
+            //     noticias: result
+            // });
+        });
+    });
+
+ - - - em models/noticiasModel:
+
+module.exports = function() {
+    this.getNoticias = function(connection, callback) {
+        // a funcao query especa 2 params: um SQL e uma funcao de callback (a funcao de callback espera dois params: erro e resultado)
+        connection.query('select * from noticias', callback);
+    }
+
+    this.getNoticia = function(connection, callback) {
+        connection.query('select * from noticias where id_noticia = 2', callback);
+    }
+
+    this.salvarNoticia = function(noticia, connection, callback){
+    	connection.query('insert into noticias set ? ', noticia, callback);
+    }
+
+    return this;
+}
+
+-------------------------------------------------------------------------
+# 41 Refactoring :: Implementando Classes
+-------------------------------------------------------------------------
+
+function NoticiasDAO(connection) {
+	this._connection = connection;
+}
+
+Noticias.prototype.getNoticias = function(callback) {
+    // a funcao query especa 2 params: um SQL e uma funcao de callback (a funcao de callback espera dois params: erro e resultado)
+    this._connection.query('select * from noticias', callback);
+}
+
+Noticias.prototype.getNoticia = function(callback) {
+    this._connection.query('select * from noticias where id_noticia = 2', callback);
+}
+
+Noticias.prototype.salvarNoticia = function(noticia, callback) {
+    this._connection.query('insert into noticias set ? ', noticia, callback);
+}
+
+module.exports = function() {
+	return Noticias;
+}
+
+// DAO => Object Access Data
+
+- - -  nos outros arquivos ::
+Agora temos que utilizar o operador "new" para instanciar um objeto.
+Ex: var noticiasModel = new app.app.models.noticiasModel(connection);
+
+
+-------------------------------------------------------------------------
+# 42 Intro ao Express Validator
+-------------------------------------------------------------------------
+npm install express-validator --save (validações de campos dos forms)
+
+Middleware express-validator ::
+
+Exemplos de validação
+
+- notEmpty()
+- isAlpha() - se é texto ou numérico
+- inInt()
+- isEmail()
+- len(4,8) - número de caracteres num campo
+- isDate()
+
+
+controllers.noticias::
+module.exports.noticias = function(application, req, res) {
+    var connection = application.config.dbConnection(); //dbConnection();
+    var noticiasModel = new application.app.models.NoticiasDAO(connection);
+
+    noticiasModel.getNoticias(function(error, result) {
+
+        // renderizar uma página enviando também o resultado (dados) // res.send(result); // serve para mandar o resultado cru para a página
+        res.render("noticias/noticias", {
+            noticias: result
+        });
+    });
+    //res.render("noticias/noticias")dbConnection 
+}
+
+module.exports.noticia = function(application, req, res) {
+    var connection = application.config.dbConnection(); //dbConnection();
+    var noticiasModel = new application.app.models.NoticiasDAO(connection);
+
+    // a funcao query especa 2 params: um SQL e uma funcao de callback (a funcao de callback espera dois params: erro e resultado)
+    noticiasModel.getNoticia(function(error, result) {
+        //res.send(result); // mandar o resultado cru para a página
+
+        // renderizar uma página enviando também o resultado (dados)
+        res.render("noticias/noticia", {
+            noticia: result
+        });
+    });
+
+    //res.render("noticias/noticias")
+}
