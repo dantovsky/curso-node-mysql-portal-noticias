@@ -2,6 +2,7 @@
   https://www.udemy.com/curso-completo-do-desenvolvedor-nodejs/
   Prof: Jorge Sant Ana
 
+
 -------------------------------------------------------------------------
 # COMANDOS
 -------------------------------------------------------------------------
@@ -15,9 +16,9 @@ npm install consign --save (faz o autoload das rotas e outros arquivos)
 npm install body-parser --save (permite transformar os dados para o formato JSON no body das requisições)
 npm install express-validator --save (validações de campos dos forms)
 
+
 -------------------------------------------------------------------------
 # 9 Arquivos até a aula 9 :: criação de servidor simples
-
 -------------------------------------------------------------------------
 
 // console.log('Criando um site de notícias com NodeJS');
@@ -57,6 +58,7 @@ if(categoria == "/tecnologia") {
 // ficar escutando em uma porta
 server.listen(3000, () => {console.log("logado")});
 
+
 -------------------------------------------------------------------------
 # 10 Visão geral do NPM, Express, EJS e Nodemon
 -------------------------------------------------------------------------
@@ -72,16 +74,19 @@ Implementa API e métodos p manip de forma mais fácil finções do Node para_
 
 => npm ::Um gerenciador de pacores JavaScript
 
+
 -------------------------------------------------------------------------
 # 18 CommonJS (Módulos)
 -------------------------------------------------------------------------
 CommonJS é um formato de escrita que define a construção dos módulos.
+
 
 -------------------------------------------------------------------------
 # 21 NPM - Instalando o modulo de conexão do MySQL
 -------------------------------------------------------------------------
 Instalar o módulo de MySQL
 npm install mysql --save (--save porque queremos disponibilizar este módulo junto com o projeto)
+
 
 -------------------------------------------------------------------------
 # 23 Criando e populando o banco de dados do projeto prático portal de notícias (MySQL)
@@ -112,6 +117,7 @@ Adicionar uma nova coluna na tabela:
 alter table noticias add column resumo varchar(100);
 MariaDB [portal_noticias]> alter table noticias add column data_noticia date;
 
+
 -------------------------------------------------------------------------
 # 25 EJS - Criando views dinâmicas com JavaScript
 -------------------------------------------------------------------------
@@ -127,6 +133,7 @@ Exemplo ::
 		<td><%= noticias[i].noticia  %></td>
 	</tr>
 <% } %>
+
 
 -------------------------------------------------------------------------
 # 29 Utilizando o Consign
@@ -153,6 +160,7 @@ npm install body-parser --save (permite transformar os dados para o formato JSON
 
 O body parser funciona como um meedleware, ou seja, vai atuar nos obj de requisição e resposta.
 Após instalar no projeto, ele precisa ser parametrizado na app.
+
 
 -------------------------------------------------------------------------
 # 39 Inserindo Registo noBD MySQL
@@ -224,6 +232,7 @@ module.exports = function() {
 
     return this;
 }
+
 
 -------------------------------------------------------------------------
 # 41 Refactoring :: Implementando Classes

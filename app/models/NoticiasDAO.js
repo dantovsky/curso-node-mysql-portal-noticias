@@ -23,5 +23,4 @@ NoticiasDAO.prototype.get5UltimasNoticias = function(callback) {
 module.exports = function() {
     return NoticiasDAO;
 }
-
 // DAO => Object Access Data
